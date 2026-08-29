@@ -4,6 +4,12 @@
 
     <springProperty
             scope="context"
+            name="environment"
+            source="app.environment"
+            defaultValue="local"/>
+
+    <springProperty
+            scope="context"
             name="serviceName"
             source="spring.application.name"
             defaultValue="order-service"/>
@@ -40,7 +46,7 @@
                     <pattern>
                         {
                         "service": "${serviceName}",
-                        "environment": "local"
+                        "environment": "${environment}"
                         }
                     </pattern>
                 </pattern>
