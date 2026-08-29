@@ -1,0 +1,12 @@
+local.file_match "order_service_logs" {
+  path_targets = [
+    {
+      __path__ = "/var/log/order-service/order-service.json",
+    },
+  ]
+}
+
+loki.source.file "order_service_logs" {
+  targets    = local.file_match.order_service_logs.targets
+  forward_to = []
+}
