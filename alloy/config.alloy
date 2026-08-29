@@ -6,7 +6,32 @@ local.file_match "order_service_logs" {
   ]
 }
 
+loki.process "order_service_logs" {
+
+  stage.json {
+    expressions = {
+      timestamp     = "timestamp",
+      level         = "level",
+      logger        = "logger",
+      thread        = "thread",
+      message       = "message",
+      service       = "service",
+      environment   = "environment",
+      correlationId = "correlationId",
+      eventType     = "eventType",
+      operation     = "operation",
+      orderId       = "orderId",
+      httpMethod    = "httpMethod",
+      httpPath      = "httpPath",
+      httpStatus    = "httpStatus",
+      durationMs    = "durationMs",
+    }
+  }
+
+  forward_to = []
+}
+
 loki.source.file "order_service_logs" {
   targets    = local.file_match.order_service_logs.targets
-  forward_to = []
+  forward_to = [loki.process.order_service_logs.receiver]
 }
