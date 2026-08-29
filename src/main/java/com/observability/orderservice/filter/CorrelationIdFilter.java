@@ -47,6 +47,7 @@ public class CorrelationIdFilter extends OncePerRequestFilter {
                     (System.nanoTime() - startTime) / 1_000_000;
             log.info(
                     "HTTP request completed",
+                    kv("eventType", "HTTP_REQUEST_COMPLETED"),
                     kv("httpMethod", request.getMethod()),
                     kv("httpPath", request.getRequestURI()),
                     kv("httpStatus", response.getStatus()),

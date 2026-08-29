@@ -29,4 +29,17 @@ public class OrderService {
 
         return "Order " + orderId + " created";
     }
+
+    public String failOrder(String orderId) {
+
+        log.info(
+                "Starting order failure simulation",
+                kv("operation", "simulate_failure"),
+                kv("orderId", orderId)
+        );
+
+        throw new IllegalStateException(
+                "Simulated order processing failure"
+        );
+    }
 }
