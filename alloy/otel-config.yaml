@@ -1,0 +1,37 @@
+receivers:
+  file_log/order_service:
+    include:
+      - /var/log/order-service/order-service.json
+
+    start_at: end
+
+    operators:
+      - type: json_parser
+
+processors:
+  batch/order_service:
+    timeout: 1s
+    send_batch_size: 100
+
+exporters:
+  kafka/order_service:
+    brokers:
+      - kafka:9094
+
+    protocol_version: "3.7.0"
+
+    logs:
+      topic: observability.order-service.logs
+      encoding: otlp_json
+
+service:
+  pipelines:
+    logs/order_service:
+      receivers:
+        - file_log/order_service
+
+      processors:
+        - batch/order_service
+
+      exporters:
+        - kafka/order_service

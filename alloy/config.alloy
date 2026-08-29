@@ -1,3 +1,4 @@
+
 local.file_match "order_service_logs" {
   path_targets = [
     {
@@ -28,10 +29,24 @@ loki.process "order_service_logs" {
     }
   }
 
+  stage.replace {
+    expression = "(?i)(password|passwd|access_token|refresh_token|authorization)"
+    replace    = "[REDACTED]"
+  }
+
+  stage.static_labels {
+    values = {
+      collector = "alloy",
+    }
+  }
+
   forward_to = []
 }
 
 loki.source.file "order_service_logs" {
-  targets    = local.file_match.order_service_logs.targets
-  forward_to = [loki.process.order_service_logs.receiver]
+  targets = local.file_match.order_service_logs.targets
+
+  forward_to = [
+    loki.process.order_service_logs.receiver,
+  ]
 }

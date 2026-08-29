@@ -5,16 +5,12 @@ services:
     container_name: event-observability-alloy
 
     command:
-      - run
-      - --server.http.listen-addr=0.0.0.0:12345
-      - /etc/alloy/config.alloy
+      - otel
+      - --config=file:/etc/alloy/otel-config.yaml
 
     volumes:
-      - ./config.alloy:/etc/alloy/config.alloy:ro
+      - ./otel-config.yaml:/etc/alloy/otel-config.yaml:ro
 
-      # IMPORTANT:
-      # Replace the host path below with the actual
-      # absolute path to your order-service/logs directory.
       - /Users/manojsingh/workspace/kafka-observability-grafana/logs:/var/log/order-service:ro
 
     ports:
