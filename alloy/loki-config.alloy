@@ -1,0 +1,71 @@
+loki.source.kafka "order_service" {
+  brokers = ["kafka:9094"]
+  topics  = ["observability.order-service.logs"]
+
+  labels = {
+    job         = "order-service",
+    environment = "local",
+  }
+
+  forward_to = [loki.process.order_service.receiver]
+}
+
+loki.process "order_service" {
+  stage.json {
+    expressions = {
+      log_body = "resourceLogs[0].scopeLogs[0].logRecords[0].body.stringValue",
+    }
+  }
+
+  stage.json {
+    source = "log_body"
+
+    expressions = {
+      timestamp     = "timestamp",
+      level         = "level",
+      message       = "message",
+      service       = "service",
+      order_id      = "orderId",
+      correlation_id = "correlationId",
+      operation     = "operation",
+    }
+  }
+
+  stage.replace {
+    source     = "log_body"
+    expression = "(?i)(\"password\"\\s*:\\s*\")[^\"]*(\")"
+    replace    = "$1[REDACTED]$2"
+  }
+
+  stage.timestamp {
+    source = "timestamp"
+    format = "RFC3339"
+  }
+
+  stage.labels {
+    values = {
+      level   = "",
+      service = "",
+    }
+  }
+
+  stage.structured_metadata {
+    values = {
+      order_id      = "",
+      correlation_id = "",
+      operation     = "",
+    }
+  }
+
+  stage.output {
+    source = "message"
+  }
+
+  forward_to = [loki.write.order_service.receiver]
+}
+
+loki.write "order_service" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

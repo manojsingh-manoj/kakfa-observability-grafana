@@ -19,6 +19,49 @@ services:
     networks:
       - infra_default
 
+  loki:
+    image: grafana/loki:3.5.0
+    container_name: event-observability-loki
+
+    command:
+      - -config.file=/etc/loki/local-config.yaml
+
+    ports:
+      - "3100:3100"
+
+    volumes:
+      - ./loki-data:/loki
+
+    networks:
+      - infra_default
+
+  alloy-loki:
+    image: grafana/alloy:latest
+    container_name: event-observability-alloy-loki
+
+    command:
+      - run
+      - /etc/alloy/config.alloy
+
+    volumes:
+      - ./loki-config.alloy:/etc/alloy/config.alloy:ro
+
+    networks:
+      - infra_default
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: event-observability-grafana
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - ./grafana-data:/var/lib/grafana
+
+    networks:
+      - infra_default
+
 networks:
   infra_default:
     external: true
